@@ -1,7 +1,12 @@
 package xdgdirs_test
 
 import (
+	"os"
+	"path/filepath"
+	"spork/osutil"
+
 	"github.com/redforks/hal"
+	"github.com/redforks/testing/iotest"
 	"github.com/redforks/testing/reset"
 	. "github.com/redforks/xdgdirs"
 
@@ -19,6 +24,10 @@ var _ = Describe("Xdgdirs", func() {
 		}
 
 		homeDir = ""
+
+		setXDGDataDirs = func(value string) {
+			envs["XDG_DATA_DIRS"] = value
+		}
 	)
 
 	BeforeEach(func() {
@@ -82,7 +91,7 @@ var _ = Describe("Xdgdirs", func() {
 		})
 
 		It("environment defined with one entry", func() {
-			envs["XDG_DATA_DIRS"] = "/share/data"
+			setXDGDataDirs("/share/data")
 			Ω(DataDirs()).Should(Equal([]string{
 				"/user/foo/.local/share",
 				"/share/data",
@@ -90,7 +99,7 @@ var _ = Describe("Xdgdirs", func() {
 		})
 
 		It("environment defined with multi entries", func() {
-			envs["XDG_DATA_DIRS"] = "/share/data:/data:/share"
+			setXDGDataDirs("/share/data:/data:/share")
 			Ω(DataDirs()).Should(Equal([]string{
 				"/user/foo/.local/share",
 				"/share/data",
@@ -118,4 +127,50 @@ var _ = Describe("Xdgdirs", func() {
 			}))
 		})
 	})
+
+	Context("Resolve file path", func() {
+
+		BeforeEach(func() {
+			homeDir = iotest.NewTempTestDir().Dir()
+			envs["HOME"] = homeDir
+			setXDGDataDirs("")
+		})
+
+		Context("ResolveDataFile", func() {
+			It("Found in 1st dir", func() {
+				fooFile := filepath.Join(homeDir, ".local/share/foo")
+				Ω(osutil.WriteFile(fooFile, nil, 0700, 0600)).Should(Succeed())
+				Ω(ResolveDataFile("foo")).Should(Equal(fooFile))
+			})
+
+			It("Found in 2nd dir", func() {
+				path2 := filepath.Join(homeDir, "data")
+				fooFile := filepath.Join(path2, "foo")
+				setXDGDataDirs(path2)
+				Ω(osutil.WriteFile(fooFile, nil, 0700, 0600)).Should(Succeed())
+				Ω(ResolveDataFile("foo")).Should(Equal(fooFile))
+			})
+
+			It("File not found", func() {
+				_, err := ResolveDataFile("foo")
+				Ω(err).Should(MatchError("[xdgdirs] Can not found data file: foo"))
+			})
+
+			It("Exist but not regular file", func() {
+				Ω(os.MkdirAll(filepath.Join(homeDir, ".local/share/foo"), 0700)).Should(Succeed())
+				_, err := ResolveDataFile("foo")
+				Ω(err).ShouldNot(BeNil())
+				Ω(err.Error()).Should(ContainSubstring("foo\" exist but not regular file"))
+			})
+		})
+
+		It("ResolveConfigFile", func() {
+			// ResolveConfigFile share the same implementation with ResolveDataFile(), so
+			// no need doing detailed tests
+			fooFile := filepath.Join(homeDir, ".config/foo")
+			Ω(osutil.WriteFile(fooFile, nil, 0700, 0600)).Should(Succeed())
+			Ω(ResolveConfigFile("foo")).Should(Equal(fooFile))
+		})
+	})
+
 })

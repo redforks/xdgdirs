@@ -2,9 +2,11 @@ package xdgdirs
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/redforks/errors"
 	"github.com/redforks/hal"
 )
 
@@ -63,4 +65,46 @@ func DataDirs() []string {
 // this order. ConfigHome() always be the first entry.
 func ConfigDirs() []string {
 	return getDirs("XDG_CONFIG_DIRS", ConfigHome(), "/etc/xdg")
+}
+
+// return non nil error if the path exist, but not a regular file.
+func existAndRegularFile(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false, nil
+	}
+
+	if !fileInfo.Mode().IsRegular() {
+		return false, errors.Runtimef("[%s] \"%s\" exist but not regular file", tag, path)
+	}
+
+	return true, nil
+}
+
+func resolveFileInDirs(path string, dirs []string, errMsg string) (string, error) {
+	for _, dir := range dirs {
+		p := filepath.Join(dir, path)
+		found, err := existAndRegularFile(p)
+		if found {
+			return p, nil
+		}
+
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return "", errors.Runtimef(errMsg, tag, path)
+}
+
+// ResolveDataFile find file in DataDirs(), returns first found file.
+// Return error if path not found, or the found path is not a regular file.
+func ResolveDataFile(path string) (string, error) {
+	return resolveFileInDirs(path, DataDirs(), "[%s] Can not found data file: %s")
+}
+
+// ResolveConfigFile find file in ConfigDirs(), returns first found file.
+// Return error if path not found, or the found path is not a regular file.
+func ResolveConfigFile(path string) (string, error) {
+	return resolveFileInDirs(path, ConfigDirs(), "[%s] Can not found config file: %s")
 }
