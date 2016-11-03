@@ -35,12 +35,12 @@ func DataHome() string {
 	return getDirWithDefault("XDG_DATA_HOME", ".local/share")
 }
 
-// ConfigHome() is directory stores user specific configuration files.
+// ConfigHome is directory stores user specific configuration files.
 func ConfigHome() string {
 	return getDirWithDefault("XDG_CONFIG_HOME", ".config")
 }
 
-// CacheHome() is a directory that user specific non-essential (cached) data
+// CacheHome is a directory that user specific non-essential (cached) data
 // should be written.
 func CacheHome() string {
 	return getDirWithDefault("XDG_CACHE_HOME", ".cache")
