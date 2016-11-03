@@ -1,9 +1,9 @@
 package xdgdirs_test
 
 import (
+	"github.com/redforks/osutil"
 	"os"
 	"path/filepath"
-	"spork/osutil"
 
 	"github.com/redforks/hal"
 	"github.com/redforks/testing/iotest"
