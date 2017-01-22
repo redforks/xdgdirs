@@ -1,9 +1,11 @@
 package xdgdirs_test
 
 import (
-	"github.com/redforks/osutil"
 	"os"
+	"os/user"
 	"path/filepath"
+
+	"github.com/redforks/osutil"
 
 	"github.com/redforks/hal"
 	"github.com/redforks/testing/iotest"
@@ -78,6 +80,33 @@ var _ = Describe("Xdgdirs", func() {
 
 		It("environment not defined", func() {
 			Ω(CacheHome()).Should(Equal("/user/foo/.cache"))
+		})
+	})
+
+	Context("RuntimeHome", func() {
+		It("environment defined", func() {
+			envs["XDG_RUNTIME_DIR"] = "/foo"
+			Ω(RuntimeHome()).Should(Equal("/foo"))
+		})
+
+		It("default for root", func() {
+			hal.CurrentUser = func() (*user.User, error) {
+				return &user.User{
+					Uid:  "0",
+					Name: "root",
+				}, nil
+			}
+			Ω(RuntimeHome()).Should(Equal("/run"))
+		})
+
+		It("default for non-root", func() {
+			hal.CurrentUser = func() (*user.User, error) {
+				return &user.User{
+					Uid:  "100",
+					Name: "user",
+				}, nil
+			}
+			Ω(RuntimeHome()).Should(Equal("/tmp/user"))
 		})
 	})
 

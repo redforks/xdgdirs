@@ -46,6 +46,29 @@ func CacheHome() string {
 	return getDirWithDefault("XDG_CACHE_HOME", ".cache")
 }
 
+// RuntimeHome returns xdg runtime directory. Use XDG_RUNTIME_DIR if defined.
+// Default to /tmp/[user]/ for non-root users, /run for root user.
+//
+// NOTE: /tmp/[user]/ noramlly not exist, RuntimeHome() do not create or check
+// it exists.
+func RuntimeHome() string {
+	r := hal.Getenv("XDG_RUNTIME_DIR")
+	if r != "" {
+		return r
+	}
+
+	u, err := hal.CurrentUser()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if u.Uid == "0" { // root
+		return "/run"
+	}
+
+	return filepath.Join(os.TempDir(), u.Name)
+}
+
 func getDirs(envName, homeDir, defDirs string) []string {
 	env := hal.Getenv(envName)
 	if env == "" {
