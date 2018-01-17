@@ -16,7 +16,7 @@ const tag = "xdgdirs"
 func Home() string {
 	r := hal.Getenv("HOME")
 	if r == "" {
-		log.Panicf("[%s] HOME environment string not defined", tag)
+		r = "/"
 	}
 	return r
 }

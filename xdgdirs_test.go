@@ -49,6 +49,11 @@ var _ = Describe("Xdgdirs", func() {
 		Ω(Home()).Should(Equal(homeDir))
 	})
 
+	It("Home env not defined", func() {
+		delete(envs, "HOME")
+		Ω(Home()).Should(Equal("/"))
+	})
+
 	Context("DataHome", func() {
 
 		It("environment defined", func() {
