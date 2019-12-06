@@ -23,6 +23,8 @@ github.com/redforks/life v0.0.0-20170416145635-2c8f13fc199f/go.mod h1:eVzO+4RryQ
 github.com/redforks/life v1.0.0/go.mod h1:q/SBmkhr2XSke8nLl9ZUs0vVzQGopO6xcuMLb9Zlmbw=
 github.com/redforks/osutil v0.0.0-20170408091144-c5c64f50970f h1:MjHwucKpRt4YrTjiHXMVu681LwelviStVJ7EHSL7PWY=
 github.com/redforks/osutil v0.0.0-20170408091144-c5c64f50970f/go.mod h1:TNQx46M2vaYE2owJnNAd01zOPq8T2GI5Gu5Kk8R2GYk=
+github.com/redforks/osutil v1.0.0 h1:xqVHjoUOJyRJOVYeX5cZ8WP0lkj7mNdDTPng2Eig6Zw=
+github.com/redforks/osutil v1.0.0/go.mod h1:KdlWvQFxwWSK7/qR6ryVYT1wgkxMdvrjEEU4QNM7cQs=
 github.com/redforks/testing v0.0.0-20190104141255-bbbf0fa9f73d/go.mod h1:1L4lnJLFaaWWsZ0ZeJmKmuBv6/r+Aw9u1Q9xbEtLcp8=
 github.com/redforks/testing v1.0.0 h1:BfREuhYbQ7jGrNMj/chDhDVm+5D/P/Y7MWkXhDV/RxA=
 github.com/redforks/testing v1.0.0/go.mod h1:oqD403PW0KEhkRjUyLf0VvVVm/y4PCBM4NIrOeJBi7U=
